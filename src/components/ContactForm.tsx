@@ -7,6 +7,7 @@ import { AutoExpandTextarea } from './AutoExpandTextarea';
 import { CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { Honeypot } from './Honeypot';
+import { supabase } from '../lib/supabase';
 import { 
   validateFormInput, 
   sanitizeInput, 
@@ -96,15 +97,24 @@ export const ContactForm: React.FC = () => {
 
       secureLog('Submitting sanitized data', sanitizedData);
 
-      // Simulate API call (replace with your actual Supabase call)
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const { error } = await supabase.from('leads').insert([{
+        name: sanitizedData.full_name,
+        phone: sanitizedData.phone,
+        email: sanitizedData.email,
+        service: sanitizedData.service,
+        message: sanitizedData.details,
+        status: 'new'
+      }]);
+
+      if (error) throw error;
       
       // 5. Success Handling
       setRateLimit(); // Start cooldown
       setIsSuccess(true);
-    } catch (error) {
+    } catch (error: any) {
       // 6. Secure Error Handling
-      setSubmitError(secureError(error));
+      setSubmitError(error.message || 'Failed to send message. Please try again.');
+      secureError('Error submitting contact form:', error);
     } finally {
       setIsSubmitting(false);
     }

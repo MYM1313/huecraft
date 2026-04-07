@@ -67,6 +67,13 @@
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
   );
 
+  -- 6. Authorized Admins Table
+  CREATE TABLE authorized_admins (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    email TEXT NOT NULL UNIQUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  );
+
   -- RLS POLICIES
 
   -- Enable RLS
@@ -75,6 +82,7 @@
   ALTER TABLE testimonials ENABLE ROW LEVEL SECURITY;
   ALTER TABLE leads ENABLE ROW LEVEL SECURITY;
   ALTER TABLE quotes ENABLE ROW LEVEL SECURITY;
+  ALTER TABLE authorized_admins ENABLE ROW LEVEL SECURITY;
 
   -- Public Read Access
   CREATE POLICY "Public Read Projects" ON projects FOR SELECT USING (true);
@@ -87,6 +95,7 @@
   CREATE POLICY "Admin Full Testimonials" ON testimonials FOR ALL TO authenticated USING (true) WITH CHECK (true);
   CREATE POLICY "Admin Full Leads" ON leads FOR ALL TO authenticated USING (true) WITH CHECK (true);
   CREATE POLICY "Admin Full Quotes" ON quotes FOR ALL TO authenticated USING (true) WITH CHECK (true);
+  CREATE POLICY "Admin Full Authorized Admins" ON authorized_admins FOR ALL TO authenticated USING (true) WITH CHECK (true);
 
   -- Public Submission Policies
   CREATE POLICY "Public Create Leads" ON leads FOR INSERT WITH CHECK (true);
