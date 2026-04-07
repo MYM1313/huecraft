@@ -113,8 +113,8 @@ export const ContactForm: React.FC = () => {
       setIsSuccess(true);
     } catch (error: any) {
       // 6. Secure Error Handling
-      setSubmitError(error.message || 'Failed to send message. Please try again.');
-      secureError('Error submitting contact form:', error);
+      setSubmitError(secureError(error));
+      secureLog('Error submitting contact form:', error);
     } finally {
       setIsSubmitting(false);
     }

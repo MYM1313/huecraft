@@ -9,6 +9,7 @@ import { ShieldCheck, Loader2, Paintbrush, Lock } from 'lucide-react';
 const Login = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   useEffect(() => {
     document.title = 'Admin Access | Huecraft';

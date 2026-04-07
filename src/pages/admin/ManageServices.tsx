@@ -53,6 +53,8 @@ const ManageServices = () => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
+  const previewUrl = formData.image_url || previewUrls[0];
+
   useEffect(() => {
     fetchServices();
   }, []);
@@ -89,7 +91,7 @@ const ManageServices = () => {
     const files = Array.from(e.target.files || []);
     if (files.length > 0) {
       setSelectedFiles(prev => [...prev, ...files]);
-      const newPreviewUrls = files.map(file => URL.createObjectURL(file));
+      const newPreviewUrls = files.map(file => URL.createObjectURL(file as Blob));
       setPreviewUrls(prev => [...prev, ...newPreviewUrls]);
     }
   };
