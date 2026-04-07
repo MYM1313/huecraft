@@ -61,7 +61,7 @@ const AppContent = () => {
 
   return (
     <div className="flex min-h-screen flex-col bg-white text-luxury-ink selection:bg-luxury-gold/20 selection:text-luxury-gold">
-      {/* {!isSupabaseConfigured && <ConfigWarning />} */}
+      {!isSupabaseConfigured && <ConfigWarning />}
       
       {/* Only show public navbar on non-admin pages */}
       {!isAdminPath && <Navbar />}

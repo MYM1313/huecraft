@@ -14,15 +14,18 @@ const ProtectedRoute: React.FC = () => {
   useEffect(() => {
     const checkAuthorization = async () => {
       if (!user) {
+        console.log('No user session found in ProtectedRoute');
         setCheckingAuth(false);
         return;
       }
 
       try {
+        console.log('Checking authorization for:', user.email);
+        
         // Fallback: Always allow the owner/dev email
         const ownerEmail = 'valuemoney77@gmail.com';
-        if (user.email && user.email.toLowerCase() === ownerEmail.toLowerCase()) {
-          console.log('Authorized as owner');
+        if (user.email && user.email.toLowerCase().trim() === ownerEmail.toLowerCase().trim()) {
+          console.log('Authorized as owner (fallback)');
           setIsAuthorized(true);
           setCheckingAuth(false);
           return;
@@ -36,26 +39,32 @@ const ProtectedRoute: React.FC = () => {
           .single();
 
         if (error) {
-          console.warn('Authorization check error:', error.message);
-          // If the table doesn't exist or other error, we might be in a fresh setup
-          // For now, if it's a "table not found" error, let's be permissive if it's the first user
-          if (error.code === 'PGRST116' || error.message?.includes('relation "authorized_admins" does not exist')) {
-             console.log('Authorized admins table not found, allowing access for setup');
+          console.warn('Authorization check error:', error.message, error.code);
+          
+          // PGRST116 means "no rows found" - if the table exists but user is not in it
+          if (error.code === 'PGRST116') {
+             console.warn('User not found in authorized_admins table');
+             setIsAuthorized(false);
+          } 
+          // Check if table doesn't exist
+          else if (error.message?.includes('relation "authorized_admins" does not exist')) {
+             console.log('Authorized admins table not found, allowing access for initial setup');
              setIsAuthorized(true);
           } else {
+            console.error('Unexpected authorization error:', error);
             setIsAuthorized(false);
-            await signOut();
           }
         } else if (!data) {
-          console.warn('Unauthorized access attempt:', user.email);
+          console.warn('No authorization data returned for:', user.email);
           setIsAuthorized(false);
-          await signOut();
         } else {
+          console.log('User authorized via database');
           setIsAuthorized(true);
         }
       } catch (err) {
-        console.error('Authorization check failed:', err);
-        setIsAuthorized(true); // Fallback to true on unexpected error to prevent blank screen
+        console.error('Unexpected error during authorization check:', err);
+        // On unexpected error, we'll be restrictive but show the error in console
+        setIsAuthorized(false);
       } finally {
         setCheckingAuth(false);
       }
