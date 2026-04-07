@@ -30,9 +30,9 @@ const ProtectedRoute: React.FC = () => {
           return;
         }
 
-        // Fallback: Always allow the owner/dev email
-        const ownerEmail = 'valuemoney77@gmail.com';
-        if (userEmail.toLowerCase().trim() === ownerEmail.toLowerCase().trim()) {
+        // Fallback: Always allow the owner/dev emails
+        const ownerEmails = ['valuemoney77@gmail.com', 'huecraft77@gmail.com'];
+        if (userEmail && ownerEmails.some(email => email.toLowerCase().trim() === userEmail.toLowerCase().trim())) {
           console.log('Authorized as owner (fallback)');
           setIsAuthorized(true);
           setCheckingAuth(false);
