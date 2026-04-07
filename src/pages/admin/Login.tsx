@@ -25,7 +25,11 @@ const Login = () => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/admin`
+          redirectTo: `${window.location.origin}/admin`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
         }
       });
       if (error) throw error;
@@ -33,6 +37,11 @@ const Login = () => {
       toast.error(error.message || 'Authentication failed');
       setGoogleLoading(false);
     }
+  };
+
+  const handleForceSignOut = async () => {
+    await supabase.auth.signOut();
+    window.location.reload();
   };
 
   return (
@@ -144,6 +153,15 @@ const Login = () => {
                 <span className="text-[9px] font-bold uppercase tracking-[0.2em]">Secure & encrypted access</span>
               </div>
               <div className="h-[1px] w-12 bg-white/10" />
+              
+              {user && (
+                <button 
+                  onClick={handleForceSignOut}
+                  className="text-[8px] font-bold uppercase tracking-[0.2em] text-luxury-gold/50 hover:text-luxury-gold transition-colors"
+                >
+                  Sign out of current session
+                </button>
+              )}
             </div>
           </div>
         </div>

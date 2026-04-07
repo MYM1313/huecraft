@@ -20,11 +20,19 @@ const ProtectedRoute: React.FC = () => {
       }
 
       try {
-        console.log('Checking authorization for:', user.email);
+        const userEmail = user.email || user.user_metadata?.email;
+        console.log('Checking authorization for:', userEmail);
         
+        if (!userEmail) {
+          console.error('No email found in user object or metadata');
+          setIsAuthorized(false);
+          setCheckingAuth(false);
+          return;
+        }
+
         // Fallback: Always allow the owner/dev email
         const ownerEmail = 'valuemoney77@gmail.com';
-        if (user.email && user.email.toLowerCase().trim() === ownerEmail.toLowerCase().trim()) {
+        if (userEmail.toLowerCase().trim() === ownerEmail.toLowerCase().trim()) {
           console.log('Authorized as owner (fallback)');
           setIsAuthorized(true);
           setCheckingAuth(false);
@@ -35,7 +43,7 @@ const ProtectedRoute: React.FC = () => {
         const { data, error } = await supabase
           .from('authorized_admins')
           .select('email')
-          .eq('email', user.email)
+          .eq('email', userEmail)
           .single();
 
         if (error) {
